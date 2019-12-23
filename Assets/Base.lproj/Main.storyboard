@@ -13,7 +13,7 @@
         <!--Navigation Controller-->
         <scene sceneID="Ehn-7C-dGP">
             <objects>
-                <navigationController id="mbW-37-5F3" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="NavigationController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="mbW-37-5F3" sceneMemberID="viewController">
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="uH7-BR-hVK">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -30,13 +30,13 @@
         <!--Virtual Tourist-->
         <scene sceneID="bPj-Xo-pDZ">
             <objects>
-                <viewController id="dI9-rN-Hg4" userLabel="Virtual Tourist" customClass="MapViewController" customModule="virtualTourist" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MapViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="dI9-rN-Hg4" userLabel="Virtual Tourist" customClass="MapViewController" customModule="virtualTourist" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="vVO-K1-sqq" userLabel="MapView">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="BuJ-Ox-gA2">
-                                <rect key="frame" x="0.0" y="44" width="414" height="826"/>
+                                <rect key="frame" x="0.0" y="88" width="414" height="782"/>
                                 <gestureRecognizers/>
                                 <connections>
                                     <outletCollection property="gestureRecognizers" destination="db7-d3-sBS" appends="YES" id="wp3-Py-SVL"/>
@@ -66,9 +66,9 @@
                         <viewLayoutGuide key="safeArea" id="4E5-aL-i0S"/>
                     </view>
                     <navigationItem key="navigationItem" title="Virtual Tourist" id="BVU-N4-jcS" userLabel="Top Bar">
-                        <barButtonItem key="rightBarButtonItem" title="Edit" id="FFl-Ir-Bb1">
+                        <barButtonItem key="rightBarButtonItem" title="Edit" id="yVn-Eu-5Py">
                             <connections>
-                                <action selector="enableEdit" destination="dI9-rN-Hg4" id="KB4-ZY-1wc"/>
+                                <action selector="enableEdit" destination="dI9-rN-Hg4" id="O1m-C8-vpi"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -94,33 +94,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eVH-Km-L8q">
-                                <rect key="frame" x="0.0" y="818" width="414" height="44"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="UbU-Uh-09r"/>
-                                </constraints>
-                                <items>
-                                    <barButtonItem title="New Collection" width="399.5" id="bjG-gj-Ua9"/>
-                                </items>
-                            </toolbar>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AGh-xA-wHg">
-                                <rect key="frame" x="0.0" y="18" width="414" height="44"/>
-                                <items>
-                                    <barButtonItem title="OK" id="saT-8w-61p">
-                                        <connections>
-                                            <segue destination="dI9-rN-Hg4" kind="presentation" id="Ii7-sP-uYz"/>
-                                        </connections>
-                                    </barButtonItem>
-                                </items>
-                            </toolbar>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="IJh-ze-4jc">
-                                <rect key="frame" x="0.0" y="62" width="414" height="116"/>
+                                <rect key="frame" x="0.0" y="44" width="414" height="73"/>
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="CMK-bo-0jd">
-                                <rect key="frame" x="0.0" y="177" width="407" height="656"/>
+                                <rect key="frame" x="0.0" y="105" width="414" height="679"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="656" id="vYZ-V2-UDA"/>
+                                    <constraint firstAttribute="height" constant="679" id="vYZ-V2-UDA"/>
                                 </constraints>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="zOo-DI-baj">
                                     <size key="itemSize" width="101" height="100"/>
@@ -157,27 +138,41 @@
                                     <outlet property="delegate" destination="DVF-Yy-3K7" id="3Bq-2o-gKB"/>
                                 </connections>
                             </collectionView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eVH-Km-L8q">
+                                <rect key="frame" x="0.0" y="784" width="414" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="UbU-Uh-09r"/>
+                                </constraints>
+                                <items>
+                                    <barButtonItem title="New Collection" width="399.5" id="bjG-gj-Ua9">
+                                        <connections>
+                                            <action selector="loadMore" destination="DVF-Yy-3K7" id="v7T-xJ-Wme"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="CMK-bo-0jd" firstAttribute="leading" secondItem="eVH-Km-L8q" secondAttribute="leading" id="33K-gN-GDp"/>
-                            <constraint firstItem="IJh-ze-4jc" firstAttribute="top" secondItem="AGh-xA-wHg" secondAttribute="bottom" id="99K-W5-2Fw"/>
-                            <constraint firstItem="eVH-Km-L8q" firstAttribute="trailing" secondItem="AGh-xA-wHg" secondAttribute="trailing" id="Cz3-Gl-v1u"/>
                             <constraint firstItem="IJh-ze-4jc" firstAttribute="leading" secondItem="ha3-5Q-pQF" secondAttribute="leading" id="KeM-t6-KF7"/>
-                            <constraint firstItem="eVH-Km-L8q" firstAttribute="bottom" secondItem="ha3-5Q-pQF" secondAttribute="bottom" id="Sxy-pY-m6E"/>
-                            <constraint firstItem="AGh-xA-wHg" firstAttribute="top" secondItem="tcf-Em-GdX" secondAttribute="topMargin" constant="-26" id="bA0-NF-96y"/>
-                            <constraint firstItem="eVH-Km-L8q" firstAttribute="top" secondItem="IJh-ze-4jc" secondAttribute="bottom" constant="640" id="cPA-xd-TLF"/>
+                            <constraint firstItem="eVH-Km-L8q" firstAttribute="bottom" secondItem="ha3-5Q-pQF" secondAttribute="bottom" constant="15" id="Sxy-pY-m6E"/>
+                            <constraint firstItem="IJh-ze-4jc" firstAttribute="top" secondItem="ha3-5Q-pQF" secondAttribute="top" id="Wfl-zm-KAd"/>
+                            <constraint firstItem="eVH-Km-L8q" firstAttribute="top" secondItem="IJh-ze-4jc" secondAttribute="bottom" constant="667" id="cPA-xd-TLF"/>
                             <constraint firstItem="CMK-bo-0jd" firstAttribute="leading" secondItem="tcf-Em-GdX" secondAttribute="leading" id="ccJ-MS-8Ic"/>
                             <constraint firstItem="ha3-5Q-pQF" firstAttribute="bottom" secondItem="CMK-bo-0jd" secondAttribute="bottom" constant="29" id="kXU-nX-bxM"/>
-                            <constraint firstItem="CMK-bo-0jd" firstAttribute="leading" secondItem="AGh-xA-wHg" secondAttribute="leading" id="lOG-ue-agm"/>
-                            <constraint firstItem="ha3-5Q-pQF" firstAttribute="trailing" secondItem="CMK-bo-0jd" secondAttribute="trailing" constant="7" id="pk9-yS-utF"/>
+                            <constraint firstItem="ha3-5Q-pQF" firstAttribute="trailing" secondItem="CMK-bo-0jd" secondAttribute="trailing" id="pk9-yS-utF"/>
                             <constraint firstAttribute="trailing" secondItem="eVH-Km-L8q" secondAttribute="trailing" id="qSf-a5-V7g"/>
                             <constraint firstItem="IJh-ze-4jc" firstAttribute="trailing" secondItem="ha3-5Q-pQF" secondAttribute="trailing" id="uvh-Vs-DAr"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="ha3-5Q-pQF"/>
                     </view>
+                    <toolbarItems/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="deleteNew" destination="bjG-gj-Ua9" id="9b1-zN-Yu9"/>
                         <outlet property="flowLayout" destination="zOo-DI-baj" id="KeB-W7-AHs"/>
+                        <outlet property="locationMap" destination="IJh-ze-4jc" id="LiH-6d-zVt"/>
                         <outlet property="photoCollectionView" destination="CMK-bo-0jd" id="AYW-h0-C25"/>
                     </connections>
                 </viewController>
@@ -186,7 +181,4 @@
             <point key="canvasLocation" x="1956.521739130435" y="-106.47321428571428"/>
         </scene>
     </scenes>
-    <inferredMetricsTieBreakers>
-        <segue reference="Ii7-sP-uYz"/>
-    </inferredMetricsTieBreakers>
 </document>

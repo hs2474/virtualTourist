@@ -10,20 +10,21 @@
 import Foundation
 import MapKit
 import CoreLocation
+import CoreData
 class virtualTouristClient {
+    
     
     enum Endpoints {
         static let base = "https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json&extras=url_m&api_key=18d6de5d7b93aa3de79ca601b0086b58"
         
         case getInitialMapData(newlat:Float, newLon:Float)
-       
-        case getUserName(uniqueKey: String)
+        case loadPhoto(newlat:Float, newLon:Float, pageNum:Int)
 
         var stringValue: String {
             switch self {
             case .getInitialMapData(let newlat, let newLon): return Endpoints.base + "&lat=\(newlat)" + "&lon=\(newLon)"
             
-            case .getUserName(let uniqueKey): return Endpoints.base + "/users/\(uniqueKey)"
+            case .loadPhoto(let newlat, let newLon, let pageNum): return Endpoints.base + "&lat=\(newlat)" + "&lon=\(newLon)" + "&pageNum=\(pageNum)"
             }
         }
         
@@ -33,6 +34,8 @@ class virtualTouristClient {
         
     }
 
+    
+    
    class func taskForGETRequestNew<ResponseType: Decodable>(url: URL, delChars:Bool, responseType: ResponseType.Type, completion: @escaping (ResponseType?, Error?) -> Void) -> URLSessionDataTask {
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             
@@ -86,9 +89,21 @@ class virtualTouristClient {
     }
 
 
-    class func  getPictures(newlat:Float, newLon:Float, completion: (@escaping ( Error?) -> Void) ) {
+    class func  getPictures(pinLocation: PinLocation, newFlag: Bool, completion: (@escaping ( Error?) -> Void) ) {
+        let newlat = pinLocation.latitude
+        let newLon = pinLocation.longitude
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        let newUrl = Endpoints.getInitialMapData(newlat:  newlat, newLon: newLon).url
+        let dataController = appDelegate.dataController
+        var pageNum = 1
+        if (!newFlag) {
+            pageNum = Int(pinLocation.pageNum)
+            pageNum = pageNum + 1
+            pinLocation.pageNum = Int32(pageNum)
+            try? dataController.viewContext.save()
+        }
+        
+        let newUrl = Endpoints.loadPhoto(newlat:  newlat, newLon: newLon, pageNum: pageNum).url
         
         print(newUrl)
         
@@ -98,8 +113,8 @@ class virtualTouristClient {
             if let response = response {
                 print("no pages")
                 print(response.flickr.currentPageNumber)
-                print(response.flickr.photos[1])
-                var newPhoto = PhotoImg(id:"", url_m:"")
+
+              //  var newPhoto = PhotoImg(id:"", url_m:"")
                 
                 for (_, value) in response.flickr.photos.enumerated()
                 {
@@ -108,11 +123,15 @@ class virtualTouristClient {
 
                     print(id);
                     print(url_m)
-                    
-                    newPhoto = PhotoImg(id:id, url_m:url_m)
-                    photoList.append(newPhoto)
-                    print(photoList.count)
-               }
+                    let pinPhotoData = PinPhotoData(context: dataController.viewContext)
+                    pinPhotoData.id = id
+                    pinPhotoData.url_m = url_m
+                    pinPhotoData.pin = pinLocation
+                   
+                    try? dataController.viewContext.save()
+                   // newPhoto = PhotoImg(id:id, url_m:url_m)
+                    //photoList.append(newPhoto)
+                }
 
             completion(nil)
         }

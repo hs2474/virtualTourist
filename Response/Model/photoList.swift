@@ -10,12 +10,5 @@
 import Foundation
 import UIKit
 
-var photoList = Array<PhotoImg>()
-
-struct PhotoImg {
-   var id: String
-   var url_m: String
-    
-}
-
+var photoList: [PinPhotoData] = []
 

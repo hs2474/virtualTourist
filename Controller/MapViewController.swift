@@ -11,15 +11,19 @@ import MapKit
 import CoreLocation
 import CoreData
 
-class MapViewController: UIViewController, MKMapViewDelegate  {
+class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate  {
     
     var numTaps = 0
 
     @IBOutlet weak var bottomToolBar: UIToolbar!
     @IBOutlet weak var mapView: MKMapView!
     
+
+    
     var dataController:DataController!
     var pinLocations: [PinLocation] = []
+    var ctr:Int = 0
+    var fetchedResultsController:NSFetchedResultsController<PinLocation>!
     
     fileprivate func setupFetchedResultsController() {
         let fetchRequest:NSFetchRequest<PinLocation> = PinLocation.fetchRequest()
@@ -31,39 +35,53 @@ class MapViewController: UIViewController, MKMapViewDelegate  {
             pinLocations = result
             printMap()
         }
-      //  fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-     //   fetchedResultsController.delegate = self
-    //    do {
-     //       try fetchedResultsController.performFetch()
-     //   } catch {
-   //         fatalError("The fetch could not be performed: \(error.localizedDescription)")
- //       }
+      
     }
     
     override func viewDidLoad() {
+        print("view did load")
         super.viewDidLoad()
+        
+        let newViewController = UserDefaults.standard.string(forKey: "initialView")
+        print(newViewController as Any)
+        
+        if (newViewController == "CollectionViewController") {
+            let collectionController = self.storyboard!.instantiateViewController(withIdentifier: "CollectionViewController") as! CollectionViewController
+            collectionController.dataController = dataController
+            self.navigationController?.pushViewController(collectionController, animated: true)
+        }
         mapView.delegate = self
         mapView.isUserInteractionEnabled = true // To detect the user events.
         
         setupFetchedResultsController()
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
+    override func viewDidAppear(_ animated: Bool) {
+        print("view did appear")
+        super.viewDidAppear(animated)
         DispatchQueue.main.async {
             if UserDefaults.standard.bool(forKey: "hasLaunchedBefore") {
                 print("App has launched before")
                 self.loadSavedMap()
             }
         }
+    }
  
-        print("forced load")
+    override func viewWillAppear(_ animated: Bool) {
+        print("view will appear")
+        super.viewWillAppear(animated)
         
+         //self.navigationController?.setNavigationBarHidden(false, animated: animated)
+     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        fetchedResultsController = nil
     }
     
     private func loadSavedMap() {
         print("in load map")
+        UserDefaults.standard.set("MapViewController", forKey: "initialView")
         if UserDefaults.standard.float(forKey: "savedLatitude") != 0 {
             print("saved location is being loaded")
             let latitude = UserDefaults.standard.double(forKey: "savedLatitude")
@@ -81,18 +99,24 @@ class MapViewController: UIViewController, MKMapViewDelegate  {
             
             mapView.region = MKCoordinateRegion(center: savedLocation, span: MKCoordinateSpan(latitudeDelta: latitudeSpan, longitudeDelta: longitudeSpan))
         }
+        else
+        {
+            print("saved data is 0")
+        }
+        print("here...is it ok")
         if UserDefaults.standard.bool(forKey: "pinEditMode"){
             bottomToolBar.isHidden = false
          }
         else
         {
              print("value is false")
+            bottomToolBar.isHidden = true
         }
     }
     
     func printMap() {
         var annotations = [MKPointAnnotation]();
-        for (ctr, value) in pinLocations.enumerated() {
+        for (_, value) in pinLocations.enumerated() {
             let lat = CLLocationDegrees(value.latitude)
             let long = CLLocationDegrees(value.longitude)
             
@@ -102,10 +126,9 @@ class MapViewController: UIViewController, MKMapViewDelegate  {
             
             let annotation = MKPointAnnotation()
             annotation.coordinate = coordinate
-            annotation.subtitle = String(ctr)
-             // Finally we place the annotation in an array of annotations.
+            // Finally we place the annotation in an array of annotations.
             annotations.append(annotation)
-            print(ctr)
+ 
          }
         DispatchQueue.main.async {
             self.mapView.addAnnotations(annotations)
@@ -135,16 +158,20 @@ class MapViewController: UIViewController, MKMapViewDelegate  {
 
             mapView.addAnnotation(annotation)
             //pin needs to persist
-            let pinLocation = PinLocation(context: dataController.viewContext)
-            pinLocation.latitude = Float(coordinates.latitude)
-            pinLocation.longitude = Float(coordinates.longitude)
-            pinLocation.pageNum = 1
+            let newPinLocation = PinLocation(context: dataController.viewContext)
+            newPinLocation.latitude = Float(coordinates.latitude)
+            newPinLocation.longitude = Float(coordinates.longitude)
+            newPinLocation.pageNum = 1
             try? dataController.viewContext.save()
-
+            
+            pinLocations.append(newPinLocation)
+            
+         
         }
     }
     
-    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool )
+    
+    func mapViewDidChangeVisibleRegion(_ mapView: MKMapView)
     {
         print("map region changed")
         let region = mapView.region.center
@@ -152,12 +179,7 @@ class MapViewController: UIViewController, MKMapViewDelegate  {
         let savedLongitude = Float(region.longitude)
         let savedlatitudeDelta = Float(mapView.region.span.latitudeDelta)
         let savedlongitudeDelta = Float(mapView.region.span.longitudeDelta)
-        print("sav lat long")
-        print(savedLatitude)
-        print(savedLongitude)
-        print("sav delta")
-        print(savedlatitudeDelta)
-        print(savedlongitudeDelta)
+       
         UserDefaults.standard.set(savedLatitude, forKey: "savedLatitude")
         UserDefaults.standard.set(savedLongitude, forKey: "savedLongitude")
         UserDefaults.standard.set(savedlatitudeDelta, forKey: "savedlatitudeDelta")
@@ -172,28 +194,40 @@ class MapViewController: UIViewController, MKMapViewDelegate  {
         let pin = view.annotation
         let newLat  = pin?.coordinate.latitude
         let newLon = pin?.coordinate.longitude
+        print(newLat as Any)
+        print(newLon as Any)
+        
+        var newCtr = 0
+        var intCtr = 0
+        
+        for (newCtr, value) in pinLocations.enumerated() {
+            if (Float(pinLocations[newCtr].latitude) == Float(newLat!) && Float(pinLocations[newCtr].longitude) == Float(newLon!)) {
+                intCtr = newCtr
+                break
+            }
+         }
+        print(intCtr)
+        let pinAtlocation:PinLocation
+        pinAtlocation = pinLocations[intCtr]
      
         if UserDefaults.standard.bool(forKey: "pinEditMode"){
             self.mapView.removeAnnotation(pin!)
-            let ctr = pin?.subtitle
-            print("ctr being printd")
-            print(ctr)
-            var intCtr = 0
-            if let ctr = ctr as? String {
-                
-                let intCtr = Int(ctr)
-            }
-            let newPin:PinLocation
-            newPin = pinLocations[intCtr]
-            dataController.viewContext.delete(newPin)
-         
+            dataController.viewContext.delete(pinAtlocation)
             try? dataController.viewContext.save()
         }
         else
         {
-            let newLat = Float(newLat!)
-            let newLon = Float(newLon!)
-            virtualTouristClient.getPictures(newlat:newLat, newLon:newLon, completion: loadPhotos(error:))
+           // virtualTouristClient.getPictures(newlat:newLat, newLon:newLon, completion: loadPhotos(error:))
+            let collectionController = self.storyboard!.instantiateViewController(withIdentifier: "CollectionViewController") as! CollectionViewController
+ 
+            collectionController.dataController = dataController
+            collectionController.sentPinLocation = pinAtlocation
+            print("going to collection")
+            print(pinAtlocation.latitude)
+            print(pinAtlocation.longitude)
+            
+            self.navigationController?.pushViewController(collectionController, animated: true)
+           
         }
     }
     

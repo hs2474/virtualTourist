@@ -22,13 +22,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             print("This is the first launch ever!")
             UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
-            UserDefaults.standard.set(35.82, forKey: "savedLatitude")
-            UserDefaults.standard.set(-95.78, forKey: "savedLongitude")
-            UserDefaults.standard.set(85.84, forKey: "savedlatitudeDelta")
-            UserDefaults.standard.set(85.84, forKey: "savedlongitudeDelta")
+            UserDefaults.standard.set(0.0, forKey: "savedLatitude")
+            UserDefaults.standard.set(0.0, forKey: "savedLongitude")
+            UserDefaults.standard.set(0.0, forKey: "savedlatitudeDelta")
+            UserDefaults.standard.set(0.0, forKey: "savedlongitudeDelta")
             UserDefaults.standard.set(false, forKey: "pinEditMode")
             UserDefaults.standard.set(false, forKey: "photoEditMode")
-            UserDefaults.standard.set("", forKey: "photoId")
+            UserDefaults.standard.set(0.00, forKey: "pinlat")
+            UserDefaults.standard.set(0.00, forKey: "pinlong")
+            UserDefaults.standard.set(0.00, forKey: "pinPageNum")
+            UserDefaults.standard.set("MapViewController", forKey: "initialView")
             UserDefaults.standard.synchronize()
         }
     }
@@ -39,15 +42,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         checkIfFirstLaunch()
         
         dataController.load()
-        
+         
+        let newViewController = UserDefaults.standard.string(forKey: "initialView")
+        print(newViewController as Any)
+/*
+        if (newViewController == "CollectionViewController") {
+            
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.window = UIWindow(frame: UIScreen.main.bounds)
+            let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+            let cc = mainStoryboard.instantiateViewController(withIdentifier: "CollectionViewController") as! CollectionViewController
+            appDelegate.window?.rootViewController = cc
+            cc.dataController  = dataController
+            appDelegate.window?.makeKeyAndVisible()
+        }
+        else  {
+ */
+            let navigationController = window?.rootViewController as! UINavigationController
+            let mapViewController = navigationController.topViewController as! MapViewController
+            mapViewController.dataController = dataController
+        /*
+        }*/
+       /*
         let navigationController = window?.rootViewController as! UINavigationController
         let mapViewController = navigationController.topViewController as! MapViewController
         mapViewController.dataController = dataController
-        
+*/
         return true
     }
     
-
+    
+    
 
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
