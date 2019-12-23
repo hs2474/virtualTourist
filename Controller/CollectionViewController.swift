@@ -147,16 +147,16 @@ class  CollectionViewController: UICollectionViewController, NSFetchedResultsCon
         let predicate1 = NSPredicate(format: "latitude = %@", savLat as Float)
         let predicate2 = NSPredicate(format: "longitude = %@", savLong as Float)
         let subpredicates: [NSPredicate]
-        subpredicates = [predicate1]
+        subpredicates = [predicate1, predicate2]
         let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subpredicates)
-        //fetchRequest.predicate = predicate1
+        fetchRequest.predicate = compoundPredicate
         
         print("before fetch")
         
         var result1 = try? self.dataController.viewContext.fetch(fetchRequest)
         print(result1)
         if (result1!.count > 0) {
-            pinLocation = result1![1]
+            pinLocation = result1![0]
         }
         else {
             print("no data found")
